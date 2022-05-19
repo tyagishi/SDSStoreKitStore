@@ -158,11 +158,11 @@ public class StoreKitStore: ObservableObject {
         if transaction.revocationDate == nil {
             //If the App Store has not revoked the transaction, add it to the list of `purchasedIdentifiers`.
             purchasedIdentifiers.insert(transaction.productID)
-//        } else {
-//            if transaction.productID != StoreKitStore.trialID {
-//                //If the App Store has revoked this transaction, remove it from the list of `purchasedIdentifiers`.
-//                purchasedIdentifiers.remove(transaction.productID)
-//            } // keep trialID as purchased even after refunded
+        } else {
+            // keep trialID as purchased even after refunded
+            //if transaction.productID != StoreKitStore.trialID {}
+            //If the App Store has revoked this transaction, remove it from the list of `purchasedIdentifiers`.
+            purchasedIdentifiers.remove(transaction.productID)
         }
     }
 }
