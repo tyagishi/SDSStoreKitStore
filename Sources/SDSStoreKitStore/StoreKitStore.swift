@@ -139,6 +139,8 @@ public class StoreKitStore: ObservableObject {
     public func retrievePurchasedProducts() async {
         var purchased: Set<String> = []
 
+        try? await AppStore.sync()
+        
         //Iterate through all of the user's purchased products.
         for await result in Transaction.currentEntitlements {
             //Don't operate on this transaction if it's not verified.
@@ -147,8 +149,14 @@ public class StoreKitStore: ObservableObject {
                    transaction.revocationDate == nil {
                     purchased.insert(transaction.productID)
                 }
+            } else {
+                print("something unknown \(result)")
             }
         }
+        for await result in Transaction.all {
+            print("result \(result)")
+        }
+        
         purchasedIdentifiers = purchased
     }
     
