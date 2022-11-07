@@ -153,9 +153,9 @@ public class StoreKitStore: ObservableObject {
                 print("something unknown \(result)")
             }
         }
-        for await result in Transaction.all {
-            print("result \(result)")
-        }
+        //for await result in Transaction.all {
+        //    print("result \(result)")
+        //}
         
         purchasedIdentifiers = purchased
     }
