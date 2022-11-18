@@ -24,7 +24,7 @@ public class StoreKitStore: ObservableObject {
 
     var updateListenerTask: Task<Void, Error>? = nil
 
-    public init(productIDs: [String]) {
+    public init(productIDs: [String], purchasedProductsIDs: [String]) {
         self.allProductIDs = Set(productIDs)
 
         //Start a transaction listener as close to app launch as possible so you don't miss any transactions.
@@ -136,10 +136,12 @@ public class StoreKitStore: ObservableObject {
     }
 
     @MainActor
-    public func retrievePurchasedProducts() async {
+    public func retrievePurchasedProducts(_ appStoreSync: Bool = false) async {
         var purchased: Set<String> = []
 
-        try? await AppStore.sync()
+        if appStoreSync {
+            try? await AppStore.sync()
+        }
         
         //Iterate through all of the user's purchased products.
         for await result in Transaction.currentEntitlements {
