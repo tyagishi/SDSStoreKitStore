@@ -102,6 +102,7 @@ public class StoreKitStore: ObservableObject {
 
             //Deliver content to the user.
             await updatePurchasedIdentifiers(transaction)
+            await updateSubscriptionInfo()
 
             //Always finish a transaction.
             await transaction.finish()
