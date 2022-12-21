@@ -19,21 +19,29 @@ public enum StoreError: Error {
 public class StoreKitStore: ObservableObject {
     public let logger = Logger(subsystem: "com.smalldesksoftware.StoreKitStore", category: "StoreKitStore")
     public let allProductIDs: Set<String>
+    public let subscriptionIDs: [String]
     @Published public private(set) var allProducts: [Product] = []
     @Published public private(set) var purchasedIdentifiers = Set<String>()
+    @Published public private(set) var purchasedProducts: [Product] = []
+    // [product-id: expire date]
+    @Published public var subscriptionInfo: [String: Date] = [:]
 
     var updateListenerTask: Task<Void, Error>? = nil
 
-    public init(productIDs: [String], purchasedProductsIDs: [String]) {
+    public init(productIDs: [String], subscriptionIDs: [String],
+                purchasedProductsIDs: [String]) {
         self.allProductIDs = Set(productIDs)
-
+        self.subscriptionIDs = subscriptionIDs
         //Start a transaction listener as close to app launch as possible so you don't miss any transactions.
         updateListenerTask = listenForTransactions()
 
-        Task {
+        Task { @MainActor in 
             //Initialize the store by starting a product request.
             await requestProducts()
             await retrievePurchasedProducts()
+            if !subscriptionIDs.isEmpty {
+                await updateSubscriptionInfo()
+            }
         }
     }
 
@@ -161,7 +169,7 @@ public class StoreKitStore: ObservableObject {
         
         purchasedIdentifiers = purchased
     }
-    
+
     
     @MainActor
     public func updatePurchasedIdentifiers(_ transaction: Transaction) async {
@@ -173,6 +181,18 @@ public class StoreKitStore: ObservableObject {
             //if transaction.productID != StoreKitStore.trialID {}
             //If the App Store has revoked this transaction, remove it from the list of `purchasedIdentifiers`.
             purchasedIdentifiers.remove(transaction.productID)
+        }
+    }
+
+    @MainActor
+    public func updateSubscriptionInfo() async {
+        for subscId in subscriptionIDs {
+            guard let subscProduct = allProducts.first(where: {$0.id == subscId}) else { continue }
+            if let resultingTransaction = await subscProduct.latestTransaction,
+               case .verified(let transaction) = resultingTransaction,
+               let expireDate = transaction.expirationDate {
+                subscriptionInfo[subscId] = expireDate
+            }
         }
     }
 }
