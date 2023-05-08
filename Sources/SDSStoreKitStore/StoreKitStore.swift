@@ -149,7 +149,11 @@ public class StoreKitStore: ObservableObject {
         var purchased: Set<String> = []
 
         if appStoreSync {
-            try? await AppStore.sync()
+            do {
+                try await AppStore.sync()
+            } catch {
+                print(error)
+            }
         }
         
         //Iterate through all of the user's purchased products.
