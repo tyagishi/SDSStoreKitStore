@@ -17,6 +17,13 @@ public enum StoreError: Error {
 }
 
 public class StoreKitStore: ObservableObject {
+    public enum RequestState {
+        case notYet, onGoing, done
+    }
+    
+    @Published public private(set) var productRequestState: RequestState = .notYet
+    @Published public private(set) var purchaseRequestState: RequestState = .notYet
+
     public let logger = Logger(subsystem: "com.smalldesksoftware.StoreKitStore", category: "StoreKitStore")
     public let allProductIDs: Set<String>
     public let subscriptionIDs: [String]
@@ -71,11 +78,14 @@ public class StoreKitStore: ObservableObject {
 
     @MainActor
     public func requestProducts() async {
+        guard productRequestState == .notYet else { return }
         do {
             //Request products from the App Store using the identifiers
+            productRequestState = .onGoing
             let storeProducts = try await Product.products(for: allProductIDs)
 
             allProducts = storeProducts.sorted(by: { $0.price < $1.price })
+            productRequestState = .done
         } catch {
             print("Failed product request: \(error)")
         }
@@ -147,6 +157,8 @@ public class StoreKitStore: ObservableObject {
     @MainActor
     public func retrievePurchasedProducts(_ appStoreSync: Bool = false) async {
         var purchased: Set<String> = []
+        
+        guard purchaseRequestState == .notYet else { return }
 
         if appStoreSync {
             do {
@@ -156,6 +168,7 @@ public class StoreKitStore: ObservableObject {
             }
         }
         
+        purchaseRequestState = .onGoing
         //Iterate through all of the user's purchased products.
         for await result in Transaction.currentEntitlements {
             //Don't operate on this transaction if it's not verified.
@@ -173,6 +186,7 @@ public class StoreKitStore: ObservableObject {
         //}
         
         purchasedIdentifiers = purchased
+        purchaseRequestState = .done
     }
 
     
