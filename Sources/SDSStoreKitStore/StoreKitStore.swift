@@ -155,6 +155,12 @@ public class StoreKitStore: ObservableObject {
     }
 
     @MainActor
+    public func resetRequestState() {
+        productRequestState = .notYet
+        purchaseRequestState = .notYet
+    }
+
+    @MainActor
     public func retrievePurchasedProducts(_ appStoreSync: Bool = false) async {
         var purchased: Set<String> = []
         
