@@ -100,6 +100,7 @@ public class StoreKitStore: ObservableObject {
         self.purchasedIdentifiers.insert(productID)
     }
     
+    @MainActor
     public func purchase(_ productID: String) async throws -> Transaction? {
         guard let product = allProducts.first(where: { $0.id == productID }) else { throw StoreError.unknownProduct }
         guard !purchasedIdentifiers.contains(productID) else { throw StoreError.duplicatePurchase }
@@ -125,6 +126,7 @@ public class StoreKitStore: ObservableObject {
         }
     }
 
+    @MainActor
     public func isPurchased(_ productIdentifier: String) async throws -> Bool {
         //Get the most recent transaction receipt for this `productIdentifier`.
         guard let result = await Transaction.latest(for: productIdentifier) else {
