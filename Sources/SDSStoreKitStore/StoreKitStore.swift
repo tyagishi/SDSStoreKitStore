@@ -35,10 +35,11 @@ public class StoreKitStore: ObservableObject {
 
     var updateListenerTask: Task<Void, Error>? = nil
 
-    public init(productIDs: [String], subscriptionIDs: [String],
-                purchasedProductsIDs: [String]) {
+    public init(productIDs: [String] = [], subscriptionIDs: [String] = [],
+                purchasedProductsIDs: [String] = []) {
         self.allProductIDs = Set(productIDs)
         self.subscriptionIDs = subscriptionIDs
+        self.purchasedIdentifiers = Set(purchasedProductsIDs)
         //Start a transaction listener as close to app launch as possible so you don't miss any transactions.
         updateListenerTask = listenForTransactions()
 
