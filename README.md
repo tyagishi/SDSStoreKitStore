@@ -8,13 +8,6 @@ Step1: initialize SDSStoreKit with passing LicenseHander for your product handli
 Note: probably defining product info with String type should make things easier,
 since productID comes from app store is String.
 
-Followings are example code.
-first public static let defines product IDs
-other functions for api for app-internal use.
-
-for modularity, those are under extension, but that is just for modularity/convenience.
-
-in somewhere
 ```
 class MyHandler: LicenseHander {
     func unverifiedResult(_ result: VerificationResult<StoreKit.Transaction>) { }  called when unknown transaction can not be verified
