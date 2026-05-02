@@ -1,4 +1,4 @@
-// swift-tools-version: 5.6
+// swift-tools-version: 5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,8 +6,8 @@ import PackageDescription
 let package = Package(
     name: "SDSStoreKitStore",
     platforms: [
-        .macOS(.v12),
-        .iOS(.v15),
+        .macOS(.v14),
+        .iOS(.v16),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
