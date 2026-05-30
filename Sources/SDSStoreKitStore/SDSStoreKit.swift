@@ -15,7 +15,6 @@ public protocol LicenseHander {
     func expireLicense(_ expireDate: Date) // revoke because of family share
 }
 
-@MainActor
 @Observable
 public final class SDSStoreKit {
     let licenseHandler: any LicenseHander
