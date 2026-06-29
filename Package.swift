@@ -7,7 +7,7 @@ let package = Package(
     name: "SDSStoreKitStore",
     platforms: [
         .macOS(.v14),
-        .iOS(.v16),
+        .iOS(.v17),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
