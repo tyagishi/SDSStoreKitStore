@@ -13,11 +13,15 @@ public protocol LicenseHander {
     func validateLicense(_ productID: String)
     func revokeLicense(_ productID: String,_ revokeDate: Date)
     func expireLicense(_ productID: String,_ expireDate: Date) // revoke because of family share
+
+    func isAvailable(_ productID: String) -> Bool
+    @MainActor
+    func purchase(_ productID: String) async throws
 }
 
 @Observable
 public final class SDSStoreKit {
-    let licenseHandler: any LicenseHander
+    public let licenseHandler: any LicenseHander
     
     public init(_ handler: any LicenseHander) {
         self.licenseHandler = handler
@@ -51,11 +55,19 @@ public final class SDSStoreKit {
         } else if let expirationDate = transaction.expirationDate {
             // In an app that supports Family Sharing, there might be another entitlement that still provides access to the subscription.
             licenseHandler.expireLicense(transaction.productID, expirationDate)
+            await transaction.finish()
             return
         } else {
             licenseHandler.validateLicense(transaction.productID)
             await transaction.finish()
             return
+        }
+    }
+    
+    public func restorePurchase() async throws {
+        try await AppStore.sync()
+        for await verificationResult in Transaction.currentEntitlements {
+            await handle(updatedTransaction: verificationResult)
         }
     }
 }
