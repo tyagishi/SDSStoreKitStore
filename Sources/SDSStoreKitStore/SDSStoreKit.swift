@@ -20,7 +20,7 @@ public protocol LicenseHander {
 }
 
 @Observable
-public final class SDSStoreKit {
+public final class SDSStoreKit: ObservableObject {
     public let licenseHandler: any LicenseHander
     
     public init(_ handler: any LicenseHander) {
